@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.noreplypratap.juicesavvy.R
+import com.noreplypratap.juicesavvy.ui.MainActivity
 import com.noreplypratap.juicesavvy.util.Constants.CHANNEL_ID
 
 @SuppressLint("ObsoleteSdkInt")
@@ -16,13 +17,12 @@ fun Context.buildNotification(
 	icon: Int,
 	batteryLevel: Int,
 	screenOn: String,
-	screenOff: String,
-	intent: Intent
+	screenOff: String
 ): Notification {
 	val pendingIntent = PendingIntent.getActivity(
-		this,
+		applicationContext,
 		0,
-		intent,
+		Intent(applicationContext, MainActivity::class.java),
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			PendingIntent.FLAG_IMMUTABLE
 		} else 0

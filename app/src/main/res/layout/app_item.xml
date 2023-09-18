@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:layout_margin="4dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
     android:layout_width="match_parent"
     android:layout_height="90dp">
 
@@ -26,15 +27,15 @@
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:text="com.whatsapp" />
 
         <TextView
             android:id="@+id/tvAppData"
-            android:textSize="18dp"
+            android:textSize="14sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
             android:layout_weight="1"
             android:text="Total Time : 2H 54M 33S " />
 

@@ -1,35 +1,40 @@
-package com.noreplypratap.juicesavvy
+package com.noreplypratap.juicesavvy.ui
 
+import android.annotation.SuppressLint
 import android.app.AppOpsManager
+import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.noreplypratap.juicesavvy.R
 import com.noreplypratap.juicesavvy.databinding.ActivityMainBinding
-import com.noreplypratap.juicesavvy.models.AppScreenUsage
+import com.noreplypratap.juicesavvy.models.AppUsageData
+import com.noreplypratap.juicesavvy.permission.RequestPermission
 import com.noreplypratap.juicesavvy.util.formatMilliseconds
+import com.noreplypratap.juicesavvy.util.logger
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private var appsData: MutableList<AppScreenUsage> = mutableListOf()
+    private var appsData: MutableList<AppUsageData> = mutableListOf()
 
-    @RequiresApi(Build.VERSION_CODES.Q)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
-
-        val myApp = application as JuicesavvyApplication
-        myApp.requestPermissions(this)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        RequestPermission.requestPermissions(this)
 
         getDataNow()
 
@@ -39,63 +44,70 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun getDataNow() {
         if (hasBatteryUsagePermission()) {
             getDataByApp()
-            val appListAdapter = AppListAdapter(appsData)
-            binding.rvList.apply {
-                adapter = appListAdapter
-            }
-            appListAdapter.notifyDataSetChanged()
         } else {
             requestBatteryUsagePermission()
         }
     }
 
+    private fun getAppDetails(packageName: String, totalTimeVisible: String): String {
+        val pm = packageManager
+        try {
+            val applicationInfo: ApplicationInfo = pm.getApplicationInfo(packageName, 0)
+            val icon: Drawable = applicationContext.packageManager.getApplicationIcon(applicationInfo)
+            val name: String = applicationContext.packageManager.getApplicationLabel(applicationInfo).toString()
+            appsData.add(AppUsageData(name,totalTimeVisible,icon))
 
-    @RequiresApi(Build.VERSION_CODES.Q)
+            showDataToUser()
+        } catch (e: Exception) {
+            logger("Exception in getting App Name")
+        }
+        return packageName
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showDataToUser() {
+        val appListAdapter = AppListAdapter(appsData)
+        binding.rvList.apply {
+            adapter = appListAdapter
+        }
+        appListAdapter.notifyDataSetChanged()
+    }
 
     private fun getDataByApp() {
+        appsData.clear()
         val usageStatsManager = getSystemService(USAGE_STATS_SERVICE) as UsageStatsManager
         val endTime = System.currentTimeMillis()
         val startTime = 0L
-        val queryUsageStats = usageStatsManager.queryUsageStats(
+        val queryUsageStats: MutableList<UsageStats> = usageStatsManager.queryUsageStats(
             UsageStatsManager.INTERVAL_MONTHLY, startTime, endTime
         )
-
         for (usageStats in queryUsageStats) {
             val totalUsageTime = usageStats.totalTimeInForeground
-            if (totalUsageTime.toInt() > (1000 * 60)) {
-
-                val appName = getAppName(applicationContext, usageStats.packageName)
+            if (totalUsageTime.toInt() > 1000) {
                 val totalTimeInForeground = formatMilliseconds(usageStats.totalTimeInForeground)
                 val totalTimeVisible = formatMilliseconds(usageStats.totalTimeVisible)
-
-                appsData.add(AppScreenUsage(appName,totalTimeVisible))
-
-
-                Log.d("qwertyuiop", "$appName")
-                Log.d("qwertyuiop", "totalTimeInForeground : $totalTimeInForeground")
-                Log.d("qwertyuiop", "totalTimeVisible : $totalTimeVisible")
-                Log.d("qwertyuiop", ".........................")
+                getAppDetails(usageStats.packageName,totalTimeVisible)
             }
         }
     }
 
-    private fun getAppName(context: Context, packageName: String): String {
-        val pm: PackageManager = context.packageManager
-        return try {
-            val applicationInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-            val appName = pm.getApplicationLabel(applicationInfo).toString()
-            appName
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.e("TAG", "Package name not found: $packageName")
-            // Handle the error, e.g., return a default value or show a message
-            packageName
-        }
-    }
+    private fun getInstalledApps(): List<ApplicationInfo> {
+        val packageManager = packageManager
+        val apps: MutableList<ApplicationInfo> = ArrayList()
 
+        val packages = packageManager.getInstalledApplications(PackageManager.MATCH_UNINSTALLED_PACKAGES)
+        for (appInfo in packages) {
+            appInfo.flags
+            // Filter out system apps (installed by the system)
+            if (appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
+                apps.add(appInfo)
+            }
+        }
+        return apps
+    }
     private fun requestBatteryUsagePermission() {
         Toast.makeText(
             this,
@@ -104,7 +116,6 @@ class MainActivity : AppCompatActivity() {
         ).show()
         startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
     }
-
     private fun hasBatteryUsagePermission(): Boolean {
         val appOpsManager =
             getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
@@ -115,6 +126,5 @@ class MainActivity : AppCompatActivity() {
         )
         return mode == AppOpsManager.MODE_ALLOWED
     }
-
 
 }
