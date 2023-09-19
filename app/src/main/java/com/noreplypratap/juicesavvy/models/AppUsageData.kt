@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 data class AppUsageData (
     val appName: String,
     val duration: String,
-    val icon: Drawable
+    val icon: Drawable,
+    val packageName: String
 )
 

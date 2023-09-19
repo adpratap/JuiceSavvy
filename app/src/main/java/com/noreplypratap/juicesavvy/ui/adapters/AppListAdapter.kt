@@ -1,4 +1,4 @@
-package com.noreplypratap.juicesavvy.ui
+package com.noreplypratap.juicesavvy.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,15 +9,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.noreplypratap.juicesavvy.R
 import com.noreplypratap.juicesavvy.models.AppUsageData
 
-class AppListAdapter(private var listOfAppScreenUsage : MutableList<AppUsageData>) : RecyclerView.Adapter<AppListAdapter.ViewHolder>()  {
+class AppListAdapter(private var listOfAppScreenUsage : List<AppUsageData>) : RecyclerView.Adapter<AppListAdapter.ViewHolder>()  {
 
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         var appName: TextView
-        var textView: TextView
+        var tvTime: TextView
+        var tvPackageName: TextView
         var icon: ImageView
         init {
-            textView = itemView.findViewById(R.id.tvAppData)
+            tvTime = itemView.findViewById(R.id.tvTotalTime)
+            tvPackageName = itemView.findViewById(R.id.tvPackageName)
             appName = itemView.findViewById(R.id.tvAppName)
             icon = itemView.findViewById(R.id.imageView)
         }
@@ -36,7 +38,8 @@ class AppListAdapter(private var listOfAppScreenUsage : MutableList<AppUsageData
         val appScreenUsage  = listOfAppScreenUsage[position]
 
         holder.itemView.apply {
-            holder.textView.text = "Total Time Visible: ${appScreenUsage.duration}"
+            holder.tvTime.text = "Total Time Visible : ${appScreenUsage.duration}"
+            holder.tvPackageName.text = "Package Name : ${appScreenUsage.packageName}"
             holder.appName.text = appScreenUsage.appName
             holder.icon.setImageDrawable(appScreenUsage.icon)
         }

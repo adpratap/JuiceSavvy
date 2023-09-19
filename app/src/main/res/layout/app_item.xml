@@ -5,7 +5,7 @@
     android:paddingStart="12dp"
     android:paddingEnd="12dp"
     android:layout_width="match_parent"
-    android:layout_height="90dp">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/imageView"
@@ -29,10 +29,19 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="com.whatsapp" />
+            android:text="Whatsapp" />
 
         <TextView
-            android:id="@+id/tvAppData"
+            android:id="@+id/tvPackageName"
+            android:textSize="14sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="com.whatsapp" />
+
+
+        <TextView
+            android:id="@+id/tvTotalTime"
             android:textSize="14sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

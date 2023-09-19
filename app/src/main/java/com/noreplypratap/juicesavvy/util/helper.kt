@@ -2,6 +2,8 @@ package com.noreplypratap.juicesavvy.util
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import com.noreplypratap.juicesavvy.service.TrackerService
@@ -103,4 +105,6 @@ fun formatMilliseconds(milliseconds: Long): String {
 fun toFormattedDateAndTime(dateAndTime: Long): String {
     return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(dateAndTime)
 }
+
+
 

@@ -13,7 +13,6 @@ import android.util.Log
 import com.noreplypratap.juicesavvy.R
 import com.noreplypratap.juicesavvy.notification.buildNotification
 import com.noreplypratap.juicesavvy.receiver.EventReceiver
-import com.noreplypratap.juicesavvy.ui.MainActivity
 import com.noreplypratap.juicesavvy.util.Constants.ACTION
 import com.noreplypratap.juicesavvy.util.Constants.NOTIFICATION_ID
 import com.noreplypratap.juicesavvy.util.Constants.TAG
@@ -189,5 +188,4 @@ class TrackerService : Service() {
 
 
 }
-
 
